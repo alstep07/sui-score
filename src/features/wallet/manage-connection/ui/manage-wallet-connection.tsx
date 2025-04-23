@@ -9,9 +9,10 @@ import { formatSuiBalance, handleError } from "@/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { UnlinkIcon } from "lucide-react";
 
-export function ManageWalletConnection() {
-  const wallet = useWallet();
+export const ManageWalletConnection: React.FC = () => {
   const [balance, setBalance] = useState<string>("0");
+
+  const { connected, account, chain, disconnect } = useWallet();
 
   const onConnectError = (error: Error) => {
     console.log(error);
@@ -24,14 +25,14 @@ export function ManageWalletConnection() {
   };
 
   useEffect(() => {
-    if (!wallet.connected || !wallet.account?.address) return;
+    if (!connected || !account?.address) return;
 
     const client = new SuiClient({ url: getFullnodeUrl("mainnet") });
 
     const fetchBalance = async () => {
       try {
         const balance = await client.getBalance({
-          owner: wallet.account!.address,
+          owner: account!.address,
           coinType: "0x2::sui::SUI",
         });
 
@@ -42,20 +43,24 @@ export function ManageWalletConnection() {
     };
 
     fetchBalance();
-  }, [wallet.connected, wallet.account?.address, wallet.account]);
+  }, [connected, account]);
 
   return (
     <div className="flex items-center gap-4">
-      {wallet.connected ? (
+      {connected ? (
         <>
-          <span className="text-sm font-mono">
-            {addressEllipsis(wallet.account?.address ?? "")}
-          </span>
-          <span className="rounded-md bg-muted p-1.5 text-xs font-mono">
-            {wallet.chain?.name}
-          </span>
+          {account?.address && (
+            <span className="text-sm font-mono">
+              {addressEllipsis(account.address)}
+            </span>
+          )}
+          {chain?.name && (
+            <span className="rounded-md bg-muted p-1.5 text-xs font-mono">
+              {chain?.name}
+            </span>
+          )}
           <span className="text-xs font-mono font-bold">{balance} SUI</span>
-          <Button variant="outline" onClick={wallet.disconnect}>
+          <Button variant="outline" onClick={disconnect}>
             <UnlinkIcon className="w-4 h-4" />
           </Button>
         </>
