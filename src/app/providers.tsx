@@ -1,12 +1,20 @@
-'use client';
+"use client";
 
-import { WalletProvider } from '@suiet/wallet-kit';
-import { PropsWithChildren } from 'react';
+import {
+  WalletProvider,
+  SuietWallet,
+  SuiWallet,
+  EthosWallet,
+} from "@suiet/wallet-kit";
+import { PropsWithChildren } from "react";
 
 export function Providers({ children }: PropsWithChildren) {
   return (
-    <WalletProvider>
+    <WalletProvider
+      autoConnect
+      defaultWallets={[SuietWallet, SuiWallet, EthosWallet]}
+    >
       {children}
     </WalletProvider>
   );
-} 
+}
